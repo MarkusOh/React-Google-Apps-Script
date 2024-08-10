@@ -19,35 +19,44 @@ const Checkbox = ({ checked, onChange }) => {
   );
 };
 
-const ScheduleTable = ({ schedules, showKoreanNameForBuyer = false, showKoreanNameForSeller = false }) => (
-  <table id="selectableTable" className="min-w-full table-auto text-left border-collapse">
-    <thead className="bg-gray-100">
-      <tr>
-        <th className="px-6 py-3 text-center">Time (in KST)</th>
-        <th className="px-6 py-3 text-center">Slot</th>
-        <th className="px-6 py-3 text-center">Buyer</th>
-        <th className="px-6 py-3 text-center">Seller</th>
-      </tr>
-    </thead>
-    <tbody>
-      {schedules.map((schedule, _, __) => {
-        const key = (schedule.associatedTime + schedule.slot).trim();
+const ScheduleTable = ({ chosenCompany = '', schedules, showKoreanNameForBuyer = false, showKoreanNameForSeller = false }) => (
+  <div id="selectableTable">
+    {
+      chosenCompany ? 
+      <div className="text-2xl font-bold my-3">
+        Schedule for {chosenCompany}
+      </div>
+      : <></>
+    }
+    <table className="min-w-full table-auto text-left border-collapse">
+      <thead className="bg-gray-100">
+        <tr>
+          <th className="px-6 py-3 text-center">Time (in KST)</th>
+          <th className="px-6 py-3 text-center">Slot</th>
+          <th className="px-6 py-3 text-center">Buyer</th>
+          <th className="px-6 py-3 text-center">Seller</th>
+        </tr>
+      </thead>
+      <tbody>
+        {schedules.map((schedule, _, __) => {
+          const key = (schedule.associatedTime + schedule.slot).trim();
 
-        return (
-          <tr key={key} className="border-b border-gray-200">
-            <td className="px-6 py-2 text-center">{schedule.associatedTime}</td>
-            <td className="px-6 py-2 text-center">{'SLOT ' + schedule.slot}</td>
-            <td className="px-6 py-2 text-center">
-              {showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}
-            </td>
-            <td className="px-6 py-2 text-center">
-              {showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </table>
+          return (
+            <tr key={key} className="border-b border-gray-200">
+              <td className="px-6 py-2 text-center">{schedule.associatedTime}</td>
+              <td className="px-6 py-2 text-center">{'SLOT ' + schedule.slot}</td>
+              <td className="px-6 py-2 text-center">
+                {showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}
+              </td>
+              <td className="px-6 py-2 text-center">
+                {showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
 );
 
 const SheetEditor = () => {
@@ -174,6 +183,7 @@ const SheetEditor = () => {
       {filteredSchedules(chosenSlot, chosenCompany).length === 0 ? null : (
         <div>
           <ScheduleTable
+            chosenCompany={chosenCompany}
             schedules={filteredSchedules(chosenSlot, chosenCompany)}
             showKoreanNameForBuyer={showKoreanNameForBuyer}
             showKoreanNameForSeller={showKoreanNameForSeller}
