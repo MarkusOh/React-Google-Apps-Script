@@ -18,17 +18,18 @@ const ScheduleTable = ({ schedules }) => (
         </tr>
       </thead>
       <tbody>
-        {schedules.map((schedule, _, __) => (
-            <>
-            <tr key={schedule.associatedTime + ' ' + schedule.slot}>
+        {schedules.map((schedule, _, __) => {
+          const key = (schedule.associatedTime + schedule.slot).trim();
+          
+          return (
+            <tr key={key}>
               <td>{schedule.associatedTime}</td>
               <td>{'SLOT ' + schedule.slot}</td>
               <td>{schedule.buyer.engName}</td>
               <td>{schedule.seller.engName}</td>
             </tr>
-            </>
-          )
-        )}
+          );
+        })}
       </tbody>
     </table>
   </>
