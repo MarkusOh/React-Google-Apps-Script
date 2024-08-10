@@ -46,6 +46,9 @@ const SheetEditor = () => {
   const [chosenSlot, setChosenSlot] = useState(-1);
 
   const schedulesBySlot = (slot) => schedules.filter(schedule => schedule.slot === slot);
+  const schedulesByCompany = (company) => schedules.filter(
+    schedule => schedule.buyer === company || schedule.seller === company
+  );
 
   useEffect(() => {
     async function initialTask() {
@@ -63,26 +66,21 @@ const SheetEditor = () => {
 
   return (
     <div>
-      {chosenSlot === -1 ? (
-        <></>
-      ) : (
-        <>
-        SELECTED SLOT {chosenSlot}
-        </>
-      )}
       {slots.length === 0 ? (
         <></>
       ) : (
         <>
-        <div>
-          {slots.map((slotNum, _, __) => (
-            <>
-              <button key={slotNum} onClick={() => setChosenSlot(slotNum)}>
-                SLOT {slotNum}
-              </button>
-            </>
-          ))}
-        </div>
+        <label>
+          Pick Slot Number: 
+          <select id='slotSelectionMenu' onChange={(_) => {
+            const selected = Number(document.getElementById('slotSelectionMenu').value);
+            setChosenSlot(selected);
+          }}>
+            {slots.map((slotNum, _, __) => (
+              <option value={slotNum}>{`Slot ${slotNum}`}</option>
+            ))}
+          </select>
+        </label>
         </>
       )}
       <ScheduleTable schedules={
