@@ -53,7 +53,9 @@ const SheetEditor = () => {
   useEffect(() => {
     async function initialTask() {
       try {
-        setSlots(await serverFunctions.getAllSlots());
+        const slotChoices = [-1].concat(await serverFunctions.getAllSlots());
+        setSlots(slotChoices);
+
         setCompanies(await serverFunctions.getData());
         setSchedules(await serverFunctions.getAllSchedules());
       } catch (error) {
@@ -77,6 +79,8 @@ const SheetEditor = () => {
             setChosenSlot(selected);
           }}>
             {slots.map((slotNum, _, __) => (
+              slotNum === -1 ? 
+              <option value={slotNum}>{`Show All Schedules`}</option> :
               <option value={slotNum}>{`Slot ${slotNum}`}</option>
             ))}
           </select>
