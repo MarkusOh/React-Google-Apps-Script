@@ -31,6 +31,8 @@ export const setActiveSheet = (sheetName: string) => {
 };
 
 interface CompanyInfo {
+  isSeller: Boolean
+  country: String
   korName: String
   engName: String
   orgType: String
@@ -48,11 +50,16 @@ interface CompanyInfo {
 }
 
 export const getData = () => {
-  const sheet = SpreadsheetApp
-    .openById('18wxZBD3ZufJk2A-DOl8S2-xjk92AROGLePu1du9c3Ho')
+  const spreadsheet = SpreadsheetApp
+  .openById('18wxZBD3ZufJk2A-DOl8S2-xjk92AROGLePu1du9c3Ho');
+
+  const sellerCompanySheet = spreadsheet
     .getSheetByName('셀러정보');
 
-  const values = sheet
+  const buyerCompanySheet = spreadsheet
+    .getSheetByName('바이어정보');
+
+  const sellerValues = sellerCompanySheet
     .getDataRange()
     .getValues()
     .filter((row, _, __) => {
@@ -63,32 +70,62 @@ export const getData = () => {
     return filtered.length > 0;
   });
 
-  var columnIndex = new Map<String, number>();
+  const buyerValues = buyerCompanySheet
+    .getDataRange()
+    .getValues()
+    .filter((row, _, __) => {
+      const filtered = row.filter((cell, _, __) => {
+        return cell
+      });
 
-  values[0]
-    .forEach((value: String, colIndex, _) => {
-      columnIndex.set(value.trim(), colIndex);
+      return filtered.length > 0;
     });
 
-  const data = values.slice(1);
+  var sellerColumnIndex = new Map<String, number>();
+  var buyerColumnIndex = new Map<String, number>();
 
-  const idxKorName = columnIndex.get('회사명(국문)');
-  const idxEngName = columnIndex.get('회사명(영문)');
-  const idxOrgType = columnIndex.get('기관유형');
-  const idxRepresentative = columnIndex.get('대표자명');
-  const idxAttendee = columnIndex.get('참가자명');
-  const idxEmail1 = columnIndex.get('이메일1');
-  const idxEmail2 = columnIndex.get('이메일2');
-  const idxWeb = columnIndex.get('홈페이지');
-  const idxAddress = columnIndex.get('주소');
-  const idxKorSummary = columnIndex.get('한줄 회사 소개');
-  const idxEngSummary = columnIndex.get('영어 한줄 회사 소개');
-  const idxDescription = columnIndex.get('회사소개');
-  const idxProductSummary = columnIndex.get('상품 내용');
-  const idxProductDescription = columnIndex.get('상품소개');
+  sellerValues[0]
+    .forEach((value: String, colIndex, _) => {
+      sellerColumnIndex.set(value.trim(), colIndex);
+    });
 
-  const allCompanyInfo = data.map((row, _, __) => {
+  buyerValues[0]
+    .forEach((value: String, colIndex, _) => {
+      buyerColumnIndex.set(value.trim(), colIndex);
+    });
+
+  const sellerData = sellerValues.slice(1);
+  const buyerData = buyerValues.slice(1);
+
+  const idxKorName = sellerColumnIndex.get('회사명(국문)');
+  const idxEngName = sellerColumnIndex.get('회사명(영문)');
+  const idxOrgType = sellerColumnIndex.get('기관유형');
+  const idxRepresentative = sellerColumnIndex.get('대표자명');
+  const idxAttendee = sellerColumnIndex.get('참가자명');
+  const idxEmail1 = sellerColumnIndex.get('이메일1');
+  const idxEmail2 = sellerColumnIndex.get('이메일2');
+  const idxWeb = sellerColumnIndex.get('홈페이지');
+  const idxAddress = sellerColumnIndex.get('주소');
+  const idxKorSummary = sellerColumnIndex.get('한줄 회사 소개');
+  const idxEngSummary = sellerColumnIndex.get('영어 한줄 회사 소개');
+  const idxDescription = sellerColumnIndex.get('회사소개');
+  const idxProductSummary = sellerColumnIndex.get('상품 내용');
+  const idxProductDescription = sellerColumnIndex.get('상품소개');
+
+  const idxCountry = buyerColumnIndex.get('Country');
+  const engIdxKorName = buyerColumnIndex.get('회사 이름');
+  const engIdxEngName = buyerColumnIndex.get('Company name');
+  const engIdxRepresentative = buyerColumnIndex.get('대표자');
+  const engIdxAttendee = buyerColumnIndex.get('Participant');
+  const engIdxEmail1 = buyerColumnIndex.get('E-Mail');
+  const engIdxWeb = buyerColumnIndex.get('Website');
+  const engIdxEngSummary = buyerColumnIndex.get('Company Profile');
+
+  const allSellers = sellerData.map((row, _, __) => {
     var info = {} as CompanyInfo;
+
+    info.isSeller = true;
+    info.country = 'Republic of Korea';
 
     if (idxKorName !== undefined) {
       info.korName = row[idxKorName];
@@ -149,5 +186,57 @@ export const getData = () => {
     return info;
   });
 
-  return allCompanyInfo;
+  const allBuyers = buyerData.map((row, _, __) => {
+    var info = {} as CompanyInfo;
+
+    info.isSeller = false;
+    info.orgType = "";
+    info.email2 = "";
+    info.address = "";
+    info.korSummary = "";
+    info.description = "";
+    info.productSummary = "";
+    info.productDescription = "";
+    
+    if (idxCountry !== undefined) {
+      info.country = row[idxCountry];
+    }
+
+    if (engIdxKorName !== undefined) {
+      info.korName = row[engIdxKorName];
+    }
+
+    if (engIdxEngName !== undefined) {
+      info.engName = row[engIdxEngName];
+    }
+
+    if (engIdxRepresentative !== undefined) {
+      info.representative = row[engIdxRepresentative];
+    }
+
+    if (engIdxAttendee !== undefined) {
+      info.attendee = row[engIdxAttendee];
+    }
+
+    if (engIdxEmail1 !== undefined) {
+      info.email1 = row[engIdxEmail1];
+    }
+
+    if (engIdxWeb !== undefined) {
+      info.web = row[engIdxWeb];
+    }
+
+    if (engIdxEngSummary !== undefined) {
+      info.engSummary = row[engIdxEngSummary];
+    }
+
+    return info;
+  });
+
+  const allCompanies = allSellers
+    .concat(allBuyers).filter((info, _, __) => {
+      return info.engName;
+    });
+
+  return allCompanies;
 };
