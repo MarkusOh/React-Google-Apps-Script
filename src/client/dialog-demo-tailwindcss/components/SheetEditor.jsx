@@ -6,61 +6,57 @@ import SheetButton from './SheetButton';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
+const Person = (props) => {
+  return (
+    <>
+    <h1>Something here!</h1>
+    <h2>Name is {props.name}</h2>
+    </>
+  );
+}
+
 const SheetEditor = () => {
-  const [names, setNames] = useState([]);
+  const name = 'John';
+  const isNameShowing = true;
+
+  const [counter, setCounter] = useState(0);
+  const [origin, setOrigin] = useState(0);
 
   useEffect(() => {
-    // Call a server global function here and handle the response with .then() and .catch()
-    serverFunctions.getSheetsData().then(setNames).catch(alert);
-  }, []);
-
-  const deleteSheet = (sheetIndex) => {
-    serverFunctions.deleteSheet(sheetIndex).then(setNames).catch(alert);
-  };
-
-  const setActiveSheet = (sheetName) => {
-    serverFunctions.setActiveSheet(sheetName).then(setNames).catch(alert);
-  };
-
-  // You can also use async/await notation for server calls with our server wrapper.
-  // (This does the same thing as .then().catch() in the above handlers.)
-  const submitNewSheet = async (newSheetName) => {
-    try {
-      const response = await serverFunctions.addSheet(newSheetName);
-      setNames(response);
-    } catch (error) {
-      // eslint-disable-next-line no-alert
-      alert(error);
+    async function doSomething() {
+      try {
+        console.log('Lets see! Please! Lets go!');
+        const hmmm = await serverFunctions.getData();
+        console.log('let me see about it ' + hmmm);
+        hmmm.forEach((value, index, _) => {
+          console.log(index + 'entry is ' + value.engName);
+        });
+      } catch (error) {
+        console.log('something went wrong!! ' + error);
+      }
     }
-  };
+
+    doSomething();
+  }, []);
 
   return (
     <div>
-      <p>
-        <b>☀️ React demo! ☀️</b>
-      </p>
-      <p>
-        This is a sample page that demonstrates a simple React app. Enter a name
-        for a new sheet, hit enter and the new sheet will be created. Click the
-        red &times; next to the sheet name to delete it.
-      </p>
-      <FormInput submitNewSheet={submitNewSheet} />
-      <TransitionGroup className="sheet-list">
-        {names.length > 0 &&
-          names.map((name) => (
-            <CSSTransition
-              classNames="sheetNames"
-              timeout={500}
-              key={name.name}
-            >
-              <SheetButton
-                sheetDetails={name}
-                deleteSheet={deleteSheet}
-                setActiveSheet={setActiveSheet}
-              />
-            </CSSTransition>
-          ))}
-      </TransitionGroup>
+      <button onClick={() => setOrigin((prevCounter) => prevCounter - 1)}>-</button>
+      <button onClick={() => setOrigin((prevCounter) => prevCounter + 1)}>+</button>
+      <h1>Hello {isNameShowing ? name : 'No name'} {name}</h1>
+      <h2>{counter}</h2>
+      <Person name={'John'}/>
+      <Person />
+      <Person />
+      <Person />
+      {isNameShowing ? (
+        <>test</>
+      ) : (
+        <>
+        <h1>test</h1>
+        <h2>no name,,,</h2>
+        </>
+      )}
     </div>
   );
 };
