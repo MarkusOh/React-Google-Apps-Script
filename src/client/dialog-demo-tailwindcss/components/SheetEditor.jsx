@@ -8,36 +8,41 @@ import { serverFunctions } from '../../utils/serverFunctions';
 
 const Checkbox = ({ checked, onChange }) => {
   return (
-    <label>
+    <label className="inline-flex items-center">
       <input
         type="checkbox"
         checked={checked}
         onChange={({ target: { checked } }) => onChange(checked)}
+        className="form-checkbox h-5 w-5 text-indigo-600"
       />
     </label>
   );
-}
+};
 
 const ScheduleTable = ({ schedules, showKoreanNameForBuyer = false, showKoreanNameForSeller = false }) => (
-  <table id='selectableTable'>
-    <thead>
+  <table id="selectableTable" className="min-w-full table-auto text-left text-sm text-gray-500 border-collapse">
+    <thead className="bg-gray-100">
       <tr>
-        <th>Time</th>
-        <th>Slot</th>
-        <th>Buyer</th>
-        <th>Seller</th>
+        <th className="px-6 py-3 text-center">Time</th>
+        <th className="px-6 py-3 text-center">Slot</th>
+        <th className="px-6 py-3 text-center">Buyer</th>
+        <th className="px-6 py-3 text-center">Seller</th>
       </tr>
     </thead>
     <tbody>
       {schedules.map((schedule, _, __) => {
         const key = (schedule.associatedTime + schedule.slot).trim();
-        
+
         return (
-          <tr key={key}>
-            <td>{schedule.associatedTime}</td>
-            <td>{'SLOT ' + schedule.slot}</td>
-            <td>{showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}</td>
-            <td>{showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}</td>
+          <tr key={key} className="border-b border-gray-200">
+            <td className="px-6 py-2 text-center">{schedule.associatedTime}</td>
+            <td className="px-6 py-2 text-center">{'SLOT ' + schedule.slot}</td>
+            <td className="px-6 py-2 text-center">
+              {showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}
+            </td>
+            <td className="px-6 py-2 text-center">
+              {showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}
+            </td>
           </tr>
         );
       })}
@@ -59,41 +64,32 @@ const SheetEditor = () => {
   const [showKoreanNameForSeller, setShowKoreanNameForSeller] = useState(false);
 
   const filteredSchedules = (slot, company) => {
-    var filterable = schedules;
+    let filterable = schedules;
 
     if (slot !== -1) {
-      filterable = filterable.filter((schedule) => {
-        return schedule.slot === slot;
-      });
+      filterable = filterable.filter((schedule) => schedule.slot === slot);
     }
 
     if (company !== '') {
-      filterable = filterable.filter((schedule) => {
-        return schedule.buyer.engName === company || 
-               schedule.buyer.korName === company ||
-               schedule.seller.engName === company ||
-               schedule.seller.korName === company;
-      });
+      filterable = filterable.filter(
+        (schedule) =>
+          schedule.buyer.engName === company ||
+          schedule.buyer.korName === company ||
+          schedule.seller.engName === company ||
+          schedule.seller.korName === company
+      );
     }
 
     return filterable;
-  }
+  };
 
   const companyName = (company) => {
     if (company.isSeller) {
-      if (showKoreanNameForSeller) {
-        return company.korName;
-      } else {
-        return company.engName;
-      }
+      return showKoreanNameForSeller ? company.korName : company.engName;
     } else {
-      if (showKoreanNameForBuyer) {
-        return company.korName;
-      } else {
-        return company.engName;
-      }
+      return showKoreanNameForBuyer ? company.korName : company.engName;
     }
-  }
+  };
 
   useEffect(() => {
     async function initialTask() {
@@ -101,7 +97,9 @@ const SheetEditor = () => {
         const slotChoices = [-1].concat(await serverFunctions.getAllSlots());
         setSlots(slotChoices);
 
-        const companyChoices = [{ engName: '<UNKNOWN_PLACEHOLDER>', korName: '<UNKNOWN_PLACEHOLDER>' }].concat(await serverFunctions.getData());
+        const companyChoices = [{ engName: '<UNKNOWN_PLACEHOLDER>', korName: '<UNKNOWN_PLACEHOLDER>' }].concat(
+          await serverFunctions.getData()
+        );
         setCompanies(companyChoices);
 
         setSchedules(await serverFunctions.getAllSchedules());
@@ -114,80 +112,88 @@ const SheetEditor = () => {
   }, []);
 
   return (
-    <div>
+    <div className="p-6 bg-white rounded-lg shadow-md space-y-4">
       <div>
-        <label>
-          Display Korean names for Buyers: 
-          <Checkbox checked={showKoreanNameForBuyer} onChange={(choice) => {
-            setShowKoreanNameForBuyer(choice);
-          }}></Checkbox>
+        <label className="text-gray-700 font-medium">
+          Display Korean names for Buyers:
+          <Checkbox checked={showKoreanNameForBuyer} onChange={(choice) => setShowKoreanNameForBuyer(choice)} />
         </label>
       </div>
       <div>
-        <label>
-          Display Korean names for Sellers: 
-          <Checkbox checked={showKoreanNameForSeller} onChange={setShowKoreanNameForSeller}></Checkbox>
+        <label className="text-gray-700 font-medium">
+          Display Korean names for Sellers:
+          <Checkbox checked={showKoreanNameForSeller} onChange={setShowKoreanNameForSeller} />
         </label>
       </div>
       <div>
-        {slots.length === 0 ? (
-          <></>
-        ) : (
+        {slots.length === 0 ? null : (
           <>
-          <label>
-            Pick Slot Number: 
-            <select id='slotSelectionMenu' onChange={(_) => {
-              const selected = Number(document.getElementById('slotSelectionMenu').value);
-              setChosenSlot(selected);
-            }}>
-              {slots.map((slotNum, _, __) => (
-                slotNum === -1 ? 
-                <option value={slotNum} key='UNKNOWN_SLOT'>{`Show All Schedules`}</option> :
-                <option value={slotNum} key={slotNum}>{`Slot ${slotNum}`}</option>
-              ))}
-            </select>
-          </label>
+            <label className="text-gray-700 font-medium">
+              Pick Slot Number:
+              <select
+                id="slotSelectionMenu"
+                onChange={() => {
+                  const selected = Number(document.getElementById('slotSelectionMenu').value);
+                  setChosenSlot(selected);
+                }}
+                className="ml-2 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {slots.map((slotNum, _, __) => (
+                  slotNum === -1 ? 
+                  <option value={slotNum} key="UNKNOWN_SLOT">{`Show All Schedules`}</option> :
+                  <option value={slotNum} key={slotNum}>{`Slot ${slotNum}`}</option>
+                ))}
+              </select>
+            </label>
           </>
         )}
       </div>
       <div>
-        {companies.length === 0 ? (
-          <></>
-        ) : (
+        {companies.length === 0 ? null : (
           <>
-          <label>
-            Pick Company: 
-            <select id='companySelectionMenu' onChange={(_) => {
-              const selected = document.getElementById('companySelectionMenu').value;
-              setChosenCompany(selected);
-            }}>
-              {companies.map((company, _, __) => (
-                company.engName === '<UNKNOWN_PLACEHOLDER>' ? 
-                <option value=''key='UNKNOWN'>{`Show All Companies`}</option> :
-                <option value={companyName(company)} key={company.engName}>{`${companyName(company)}`}</option>
-              ))}
-            </select>
-          </label>
+            <label className="text-gray-700 font-medium">
+              Pick Company:
+              <select
+                id="companySelectionMenu"
+                onChange={() => {
+                  const selected = document.getElementById('companySelectionMenu').value;
+                  setChosenCompany(selected);
+                }}
+                className="ml-2 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {companies.map((company, _, __) => (
+                  company.engName === '<UNKNOWN_PLACEHOLDER>' ? 
+                  <option value="" key="UNKNOWN">{`Show All Companies`}</option> :
+                  <option value={companyName(company)} key={company.engName}>{`${companyName(company)}`}</option>
+                ))}
+              </select>
+            </label>
           </>
         )}
       </div>
-      {
-        filteredSchedules(chosenSlot, chosenCompany).length === 0 ?
-        <></> :
+      {filteredSchedules(chosenSlot, chosenCompany).length === 0 ? null : (
         <div>
-          <ScheduleTable schedules={
-            filteredSchedules(chosenSlot, chosenCompany)
-          } showKoreanNameForBuyer={showKoreanNameForBuyer} showKoreanNameForSeller={showKoreanNameForSeller} />
-          <button type="button" onClick={() => {
+          <ScheduleTable
+            schedules={filteredSchedules(chosenSlot, chosenCompany)}
+            showKoreanNameForBuyer={showKoreanNameForBuyer}
+            showKoreanNameForSeller={showKoreanNameForSeller}
+          />
+          <button
+            type="button"
+            onClick={() => {
               const table = document.getElementById('selectableTable');
               const range = document.createRange();
               const selection = window.getSelection();
               range.selectNodeContents(table);
               selection.removeAllRanges();
               selection.addRange(range);
-            }}>{`>> Select Table <<`}</button>
+            }}
+            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            {`Select Table`}
+          </button>
         </div>
-      }
+      )}
     </div>
   );
 };
