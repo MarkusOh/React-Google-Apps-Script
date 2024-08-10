@@ -6,65 +6,62 @@ import SheetButton from './SheetButton';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
-const Person = (props) => {
-  return (
-    <>
-    <h1>Something here!</h1>
-    <h2>Name is {props.name}</h2>
-    </>
-  );
-}
+const ScheduleTable = ({ schedules }) => (
+  <>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Slot</th>
+          <th>Buyer</th>
+          <th>Seller</th>
+        </tr>
+      </thead>
+      <tbody>
+        {schedules.map((schedule, _, __) => (
+            <>
+            <tr key={schedule.associatedTime + ' ' + schedule.slot}>
+              <td>{schedule.associatedTime}</td>
+              <td>{'SLOT ' + schedule.slot}</td>
+              <td>{schedule.buyer.engName}</td>
+              <td>{schedule.seller.engName}</td>
+            </tr>
+            </>
+          )
+        )}
+      </tbody>
+    </table>
+  </>
+);
 
 const SheetEditor = () => {
   const name = 'John';
   const isNameShowing = true;
 
-  
+  const [slots, setSlots] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [schedules, setSchedules] = useState([]);
 
+  const [chosenCompany, setChosenCompany] = useState('');
+  const [chosenSlot, setChosenSlot] = useState(-1);
+
   useEffect(() => {
-    async function doSomething() {
+    async function initialTask() {
       try {
-        console.log('Lets see! Please! Lets go!');
-        const hmmm = await serverFunctions.getData();
-        const hmm2 = await serverFunctions.getAllAssociatedSchedulesForName('(주)에이치엔티');
-        console.log('let me see about it ' + hmmm);
-        console.log('let me see schedule! ' + hmm2);
-        const hmm3 = await serverFunctions.getAllSchedulesForSlot(2);
-        const hmm4 = await serverFunctions.getAllSlots();
-
-        console.log('let me see scheduels for slot 2 ' + hmm3);
-        console.log('slots are ');
-
-        hmm4.forEach((num, _, __) => {
-          console.log('slot ' + num);
-        });
-
-        hmm2.forEach((value, index, _) => {
-          console.log(index + 'entry is ' + value.engName);
-        });
+        setSlots(await serverFunctions.getAllSlots());
+        setCompanies(await serverFunctions.getData());
+        setSchedules(await serverFunctions.getAllSchedules());
       } catch (error) {
         console.log('something went wrong!! ' + error);
       }
     }
 
-    doSomething();
+    initialTask();
   }, []);
 
   return (
     <div>
-      <Person name={'John'}/>
-      <Person />
-      <Person />
-      <Person />
-      {isNameShowing ? (
-        <>test</>
-      ) : (
-        <>
-        <h1>test</h1>
-        <h2>no name,,,</h2>
-        </>
-      )}
+      <ScheduleTable schedules={schedules} />
     </div>
   );
 };
