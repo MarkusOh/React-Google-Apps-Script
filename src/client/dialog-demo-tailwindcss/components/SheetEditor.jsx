@@ -20,7 +20,7 @@ const Checkbox = ({ checked, onChange }) => {
 };
 
 const ScheduleTable = ({ schedules, showKoreanNameForBuyer = false, showKoreanNameForSeller = false }) => (
-  <table id="selectableTable" className="min-w-full table-auto text-left text-sm text-gray-500 border-collapse">
+  <table id="selectableTable" className="min-w-full table-auto text-left border-collapse">
     <thead className="bg-gray-100">
       <tr>
         <th className="px-6 py-3 text-center">Time (in Korea Standard Time)</th>
