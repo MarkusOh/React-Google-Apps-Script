@@ -121,7 +121,7 @@ const SheetEditor = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md space-y-4">
+    <div className="p-6 bg-white space-y-4">
       <div>
         <label className="text-gray-700 font-medium">
           Display Korean names for Buyers:
