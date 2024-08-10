@@ -49,10 +49,10 @@ interface CompanyInfo {
   productDescription: String
 }
 
-export const getData = () => {
-  const spreadsheet = SpreadsheetApp
+export const spreadsheet = SpreadsheetApp
   .openById('18wxZBD3ZufJk2A-DOl8S2-xjk92AROGLePu1du9c3Ho');
 
+export const getData = () => {
   const sellerCompanySheet = spreadsheet
     .getSheetByName('셀러정보');
 
@@ -240,3 +240,101 @@ export const getData = () => {
 
   return allCompanies;
 };
+
+interface Schedule {
+  associatedTime: String
+  buyer: CompanyInfo
+  seller: CompanyInfo
+  slot: number
+}
+
+export const getAllSchedules = () => {
+  const scheduleSheet = spreadsheet
+    .getSheetByName('Schedule');
+
+  const rows = scheduleSheet
+    .getDataRange()
+    .getValues();
+
+  let timeIndex = 0;
+
+  const allCompanyInfo = getData();
+
+  let latestTime: String = '';
+  let buyersAtThatTime: CompanyInfo[] | undefined = undefined;
+  let sellersAtThatTime: CompanyInfo[] | undefined = undefined;
+
+  let schedules: Schedule[] = [];
+
+  rows.slice(1).forEach((row, _, __) => {
+    row.forEach((cell: String, columnIndex, _) => {
+      if (columnIndex === timeIndex) {
+        if (cell) {
+          // Make schedules from the previous iterations
+          let index = 0;
+          while (buyersAtThatTime !== undefined &&
+                 sellersAtThatTime !== undefined &&
+                 latestTime) {
+            if (buyersAtThatTime[index] || sellersAtThatTime[index]) {
+              let schedule = {} as Schedule;
+              schedule.slot = index + 1;
+              schedule.associatedTime = latestTime;
+              schedule.buyer = buyersAtThatTime[index] ?? '';
+              schedule.seller = sellersAtThatTime[index] ?? '';
+              schedules.push(schedule);
+            }
+
+            index += 1;
+
+            if (index === buyersAtThatTime.length || index === sellersAtThatTime.length) {
+              buyersAtThatTime = undefined;
+              sellersAtThatTime = undefined;
+              latestTime = '';
+              index = 0;
+            }
+          }
+
+          latestTime = cell;
+        }
+      } else if (cell === 'BUYER') {
+        buyersAtThatTime = [];
+      } else if (cell === 'SELLER') {
+        sellersAtThatTime = [];
+      } else {
+        const company = allCompanyInfo.filter((info, _, __) => {
+          return info.engName === cell || info.korName === cell;
+        })[0];
+
+        if (sellersAtThatTime !== undefined) {
+          sellersAtThatTime.push(company);
+        } else if (buyersAtThatTime !== undefined) {
+          buyersAtThatTime.push(company);
+        }
+      }
+    });
+  });
+
+  return schedules;
+}
+
+export const getAllAssociatedSchedules = (info: CompanyInfo) => {
+  const allSchedules = getAllSchedules();
+
+  return allSchedules.filter((schedule, _, __) => {
+    return schedule.buyer.engName === info.engName || schedule.seller.engName === info.engName;
+  });
+}
+
+export const getAllAssociatedSchedulesForName = (name: String) => {
+  const allCompanies = getData();
+
+  const company = allCompanies.filter((info, _, __) => {
+    return info.engName === name || info.korName === name;
+  })[0];
+
+  if (company === undefined) {
+    return [];
+  }
+
+  return getAllAssociatedSchedules(company);
+}

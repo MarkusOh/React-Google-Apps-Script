@@ -27,8 +27,12 @@ const SheetEditor = () => {
       try {
         console.log('Lets see! Please! Lets go!');
         const hmmm = await serverFunctions.getData();
+        const hmm2 = await serverFunctions.getAllAssociatedSchedulesForName('(주)에이치엔티');
         console.log('let me see about it ' + hmmm);
-        hmmm.forEach((value, index, _) => {
+        console.log('let me see schedule! ' + hmm2);
+
+
+        hmm2.forEach((value, index, _) => {
           console.log(index + 'entry is ' + value.engName);
         });
       } catch (error) {
