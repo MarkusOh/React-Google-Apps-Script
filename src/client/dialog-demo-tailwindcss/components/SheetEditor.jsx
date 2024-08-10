@@ -19,8 +19,8 @@ const SheetEditor = () => {
   const name = 'John';
   const isNameShowing = true;
 
-  const [counter, setCounter] = useState(0);
-  const [origin, setOrigin] = useState(0);
+  
+  const [schedules, setSchedules] = useState([]);
 
   useEffect(() => {
     async function doSomething() {
@@ -30,7 +30,15 @@ const SheetEditor = () => {
         const hmm2 = await serverFunctions.getAllAssociatedSchedulesForName('(주)에이치엔티');
         console.log('let me see about it ' + hmmm);
         console.log('let me see schedule! ' + hmm2);
+        const hmm3 = await serverFunctions.getAllSchedulesForSlot(2);
+        const hmm4 = await serverFunctions.getAllSlots();
 
+        console.log('let me see scheduels for slot 2 ' + hmm3);
+        console.log('slots are ');
+
+        hmm4.forEach((num, _, __) => {
+          console.log('slot ' + num);
+        });
 
         hmm2.forEach((value, index, _) => {
           console.log(index + 'entry is ' + value.engName);
@@ -45,10 +53,6 @@ const SheetEditor = () => {
 
   return (
     <div>
-      <button onClick={() => setOrigin((prevCounter) => prevCounter - 1)}>-</button>
-      <button onClick={() => setOrigin((prevCounter) => prevCounter + 1)}>+</button>
-      <h1>Hello {isNameShowing ? name : 'No name'} {name}</h1>
-      <h2>{counter}</h2>
       <Person name={'John'}/>
       <Person />
       <Person />

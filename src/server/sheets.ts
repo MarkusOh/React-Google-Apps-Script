@@ -317,6 +317,12 @@ export const getAllSchedules = () => {
   return schedules;
 }
 
+export const getAllSchedulesForSlot = (slotNumber: number) => {
+  return getAllSchedules().filter((schedule, _, __) => {
+    return schedule.slot === slotNumber;
+  });
+}
+
 export const getAllAssociatedSchedules = (info: CompanyInfo) => {
   const allSchedules = getAllSchedules();
 
@@ -337,4 +343,20 @@ export const getAllAssociatedSchedulesForName = (name: String) => {
   }
 
   return getAllAssociatedSchedules(company);
+}
+
+export const getAllSlots = () => {
+  let values = spreadsheet
+    .getSheetByName('Schedule')
+    .getDataRange()
+    .getValues();
+
+  const columns = values[0];
+  return columns.filter((value: String, _, __) => {
+    return value && value.includes('SLOT');
+  }).map((value: String, _, __) => {
+    const raw = value.split('SLOT');
+    const slotNumber = Number(raw[raw.length - 1]);
+    return slotNumber;
+  });
 }
