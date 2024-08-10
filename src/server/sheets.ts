@@ -49,14 +49,16 @@ interface CompanyInfo {
   productDescription: String
 }
 
-export const spreadsheet = SpreadsheetApp
-  .openById('18wxZBD3ZufJk2A-DOl8S2-xjk92AROGLePu1du9c3Ho');
+export const spreadsheet = () => {
+  return SpreadsheetApp
+    .openById('18wxZBD3ZufJk2A-DOl8S2-xjk92AROGLePu1du9c3Ho');
+};
 
 export const getData = () => {
-  const sellerCompanySheet = spreadsheet
+  const sellerCompanySheet = spreadsheet()
     .getSheetByName('셀러정보');
 
-  const buyerCompanySheet = spreadsheet
+  const buyerCompanySheet = spreadsheet()
     .getSheetByName('바이어정보');
 
   const sellerValues = sellerCompanySheet
@@ -249,7 +251,7 @@ interface Schedule {
 }
 
 export const getAllSchedules = () => {
-  const scheduleSheet = spreadsheet
+  const scheduleSheet = spreadsheet()
     .getSheetByName('Schedule');
 
   const rows = scheduleSheet
@@ -346,7 +348,7 @@ export const getAllAssociatedSchedulesForName = (name: String) => {
 }
 
 export const getAllSlots = () => {
-  let values = spreadsheet
+  let values = spreadsheet()
     .getSheetByName('Schedule')
     .getDataRange()
     .getValues();
