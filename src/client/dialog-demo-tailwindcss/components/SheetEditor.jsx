@@ -180,7 +180,11 @@ const SheetEditor = () => {
           </>
         )}
       </div>
-      {filteredSchedules(chosenSlot, chosenCompany).length === 0 ? null : (
+      {filteredSchedules(chosenSlot, chosenCompany).length === 0 ? (
+        <div className="flex justify-center items-center my-6">
+          <div className="w-8 h-8 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+        </div>
+        ) : (
         <div>
           <ScheduleTable
             chosenCompany={chosenCompany}
