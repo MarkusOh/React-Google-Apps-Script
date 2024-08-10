@@ -6,7 +6,19 @@ import SheetButton from './SheetButton';
 // This is a wrapper for google.script.run that lets us use promises.
 import { serverFunctions } from '../../utils/serverFunctions';
 
-const ScheduleTable = ({ schedules }) => (
+const Checkbox = ({ checked, onChange }) => {
+  return (
+    <label>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={({ target: { checked } }) => onChange(checked)}
+      />
+    </label>
+  );
+}
+
+const ScheduleTable = ({ schedules, showKoreanName = false }) => (
   <>
     <table>
       <thead>
@@ -25,8 +37,8 @@ const ScheduleTable = ({ schedules }) => (
             <tr key={key}>
               <td>{schedule.associatedTime}</td>
               <td>{'SLOT ' + schedule.slot}</td>
-              <td>{schedule.buyer.engName}</td>
-              <td>{schedule.seller.engName}</td>
+              <td>{showKoreanName ? schedule.buyer.korName : schedule.buyer.engName}</td>
+              <td>{showKoreanName ? schedule.seller.korName : schedule.seller.engName}</td>
             </tr>
           );
         })}
@@ -45,6 +57,7 @@ const SheetEditor = () => {
 
   const [chosenCompany, setChosenCompany] = useState('');
   const [chosenSlot, setChosenSlot] = useState(-1);
+  const [showKoreanName, setShowKoreanName] = useState(false);
 
   const filteredSchedules = (slot, company) => {
     var filterable = schedules;
@@ -67,6 +80,14 @@ const SheetEditor = () => {
     return filterable;
   }
 
+  const companyName = (company) => {
+    if (showKoreanName) {
+      return company.korName;
+    } else {
+      return company.engName;
+    }
+  }
+
   useEffect(() => {
     async function initialTask() {
       try {
@@ -87,6 +108,12 @@ const SheetEditor = () => {
 
   return (
     <div>
+      <div>
+        <label>
+          Display Korean names: 
+          <Checkbox checked={showKoreanName} onChange={setShowKoreanName}></Checkbox>
+        </label>
+      </div>
       <div>
         {slots.length === 0 ? (
           <></>
@@ -122,7 +149,7 @@ const SheetEditor = () => {
               {companies.map((company, _, __) => (
                 company.engName === '<UNKNOWN_PLACEHOLDER>' ? 
                 <option value=''key='UNKNOWN'>{`Show All Companies`}</option> :
-                <option value={company.engName} key={company.engName}>{`${company.engName}`}</option>
+                <option value={companyName(company)} key={companyName(company)}>{`${companyName(company)}`}</option>
               ))}
             </select>
           </label>
@@ -131,7 +158,7 @@ const SheetEditor = () => {
       </div>
       <ScheduleTable schedules={
         filteredSchedules(chosenSlot, chosenCompany)
-      } />
+      } showKoreanName={showKoreanName} />
     </div>
   );
 };
