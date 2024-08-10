@@ -23,7 +23,7 @@ const ScheduleTable = ({ schedules, showKoreanNameForBuyer = false, showKoreanNa
   <table id="selectableTable" className="min-w-full table-auto text-left border-collapse">
     <thead className="bg-gray-100">
       <tr>
-        <th className="px-6 py-3 text-center">Time (in Korea Standard Time)</th>
+        <th className="px-6 py-3 text-center">Time (in KST)</th>
         <th className="px-6 py-3 text-center">Slot</th>
         <th className="px-6 py-3 text-center">Buyer</th>
         <th className="px-6 py-3 text-center">Seller</th>
