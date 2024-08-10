@@ -18,7 +18,7 @@ const Checkbox = ({ checked, onChange }) => {
   );
 }
 
-const ScheduleTable = ({ schedules, showKoreanName = false }) => (
+const ScheduleTable = ({ schedules, showKoreanNameForBuyer = false, showKoreanNameForSeller = false }) => (
   <>
     <table>
       <thead>
@@ -37,8 +37,8 @@ const ScheduleTable = ({ schedules, showKoreanName = false }) => (
             <tr key={key}>
               <td>{schedule.associatedTime}</td>
               <td>{'SLOT ' + schedule.slot}</td>
-              <td>{showKoreanName ? schedule.buyer.korName : schedule.buyer.engName}</td>
-              <td>{showKoreanName ? schedule.seller.korName : schedule.seller.engName}</td>
+              <td>{showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}</td>
+              <td>{showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}</td>
             </tr>
           );
         })}
@@ -57,7 +57,8 @@ const SheetEditor = () => {
 
   const [chosenCompany, setChosenCompany] = useState('');
   const [chosenSlot, setChosenSlot] = useState(-1);
-  const [showKoreanName, setShowKoreanName] = useState(false);
+  const [showKoreanNameForBuyer, setShowKoreanNameForBuyer] = useState(false);
+  const [showKoreanNameForSeller, setShowKoreanNameForSeller] = useState(false);
 
   const filteredSchedules = (slot, company) => {
     var filterable = schedules;
@@ -81,10 +82,18 @@ const SheetEditor = () => {
   }
 
   const companyName = (company) => {
-    if (showKoreanName) {
-      return company.korName;
+    if (company.isSeller) {
+      if (showKoreanNameForSeller) {
+        return company.korName;
+      } else {
+        return company.engName;
+      }
     } else {
-      return company.engName;
+      if (showKoreanNameForBuyer) {
+        return company.korName;
+      } else {
+        return company.engName;
+      }
     }
   }
 
@@ -110,8 +119,16 @@ const SheetEditor = () => {
     <div>
       <div>
         <label>
-          Display Korean names: 
-          <Checkbox checked={showKoreanName} onChange={setShowKoreanName}></Checkbox>
+          Display Korean names for Buyers: 
+          <Checkbox checked={showKoreanNameForBuyer} onChange={(choice) => {
+            setShowKoreanNameForBuyer(choice);
+          }}></Checkbox>
+        </label>
+      </div>
+      <div>
+        <label>
+          Display Korean names for Sellers: 
+          <Checkbox checked={showKoreanNameForSeller} onChange={setShowKoreanNameForSeller}></Checkbox>
         </label>
       </div>
       <div>
@@ -149,7 +166,7 @@ const SheetEditor = () => {
               {companies.map((company, _, __) => (
                 company.engName === '<UNKNOWN_PLACEHOLDER>' ? 
                 <option value=''key='UNKNOWN'>{`Show All Companies`}</option> :
-                <option value={companyName(company)} key={companyName(company)}>{`${companyName(company)}`}</option>
+                <option value={companyName(company)} key={company.engName}>{`${companyName(company)}`}</option>
               ))}
             </select>
           </label>
@@ -158,7 +175,7 @@ const SheetEditor = () => {
       </div>
       <ScheduleTable schedules={
         filteredSchedules(chosenSlot, chosenCompany)
-      } showKoreanName={showKoreanName} />
+      } showKoreanNameForBuyer={showKoreanNameForBuyer} showKoreanNameForSeller={showKoreanNameForSeller} />
     </div>
   );
 };
