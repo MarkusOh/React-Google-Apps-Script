@@ -51,7 +51,7 @@ interface CompanyInfo {
 
 export const spreadsheet = () => {
   return SpreadsheetApp
-    .openById('18wxZBD3ZufJk2A-DOl8S2-xjk92AROGLePu1du9c3Ho');
+    .openById('18KMesRalkDJZD8-htmwAlwvS8sMbHnluI1wd0KxwrLU');
 };
 
 export const getData = () => {
