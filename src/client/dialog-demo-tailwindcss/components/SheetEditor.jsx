@@ -45,6 +45,8 @@ const SheetEditor = () => {
   const [chosenCompany, setChosenCompany] = useState('');
   const [chosenSlot, setChosenSlot] = useState(-1);
 
+  const schedulesBySlot = (slot) => schedules.filter(schedule => schedule.slot === slot);
+
   useEffect(() => {
     async function initialTask() {
       try {
@@ -61,7 +63,33 @@ const SheetEditor = () => {
 
   return (
     <div>
-      <ScheduleTable schedules={schedules} />
+      {chosenSlot === -1 ? (
+        <></>
+      ) : (
+        <>
+        SELECTED SLOT {chosenSlot}
+        </>
+      )}
+      {slots.length === 0 ? (
+        <></>
+      ) : (
+        <>
+        <div>
+          {slots.map((slotNum, _, __) => (
+            <>
+              <button key={slotNum} onClick={() => setChosenSlot(slotNum)}>
+                SLOT {slotNum}
+              </button>
+            </>
+          ))}
+        </div>
+        </>
+      )}
+      <ScheduleTable schedules={
+        chosenSlot !== -1 ? 
+          schedulesBySlot(chosenSlot) : 
+          schedules
+      } />
     </div>
   );
 };
