@@ -19,32 +19,30 @@ const Checkbox = ({ checked, onChange }) => {
 }
 
 const ScheduleTable = ({ schedules, showKoreanNameForBuyer = false, showKoreanNameForSeller = false }) => (
-  <>
-    <table>
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Slot</th>
-          <th>Buyer</th>
-          <th>Seller</th>
-        </tr>
-      </thead>
-      <tbody>
-        {schedules.map((schedule, _, __) => {
-          const key = (schedule.associatedTime + schedule.slot).trim();
-          
-          return (
-            <tr key={key}>
-              <td>{schedule.associatedTime}</td>
-              <td>{'SLOT ' + schedule.slot}</td>
-              <td>{showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}</td>
-              <td>{showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  </>
+  <table id='selectableTable'>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Slot</th>
+        <th>Buyer</th>
+        <th>Seller</th>
+      </tr>
+    </thead>
+    <tbody>
+      {schedules.map((schedule, _, __) => {
+        const key = (schedule.associatedTime + schedule.slot).trim();
+        
+        return (
+          <tr key={key}>
+            <td>{schedule.associatedTime}</td>
+            <td>{'SLOT ' + schedule.slot}</td>
+            <td>{showKoreanNameForBuyer ? schedule.buyer.korName : schedule.buyer.engName}</td>
+            <td>{showKoreanNameForSeller ? schedule.seller.korName : schedule.seller.engName}</td>
+          </tr>
+        );
+      })}
+    </tbody>
+  </table>
 );
 
 const SheetEditor = () => {
@@ -173,9 +171,23 @@ const SheetEditor = () => {
           </>
         )}
       </div>
-      <ScheduleTable schedules={
-        filteredSchedules(chosenSlot, chosenCompany)
-      } showKoreanNameForBuyer={showKoreanNameForBuyer} showKoreanNameForSeller={showKoreanNameForSeller} />
+      {
+        filteredSchedules(chosenSlot, chosenCompany).length === 0 ?
+        <></> :
+        <div>
+          <ScheduleTable schedules={
+            filteredSchedules(chosenSlot, chosenCompany)
+          } showKoreanNameForBuyer={showKoreanNameForBuyer} showKoreanNameForSeller={showKoreanNameForSeller} />
+          <button type="button" onClick={() => {
+              const table = document.getElementById('selectableTable');
+              const range = document.createRange();
+              const selection = window.getSelection();
+              range.selectNodeContents(table);
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }}>{`>> Select Table <<`}</button>
+        </div>
+      }
     </div>
   );
 };
